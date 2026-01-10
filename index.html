@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ShopManage - Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-50">
+    <!-- Sticky Navbar -->
+    <nav class="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-16">
+          <div class="flex items-center">
+            <svg
+              class="w-8 h-8 text-blue-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+              ></path>
+            </svg>
+            <h1 class="ml-3 text-xl font-bold text-gray-900">ShopManage</h1>
+          </div>
+          <button
+            id="add-product-btn"
+            class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+          >
+            <svg
+              class="w-5 h-5 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 4v16m8-8H4"
+              ></path>
+            </svg>
+            Add Product
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <!-- Page Header -->
+      <div class="mb-8">
+        <h2 class="text-3xl font-bold text-gray-900">Product Management</h2>
+        <p class="mt-2 text-sm text-gray-600">
+          Manage your store inventory and product catalog
+        </p>
+      </div>
+
+      <!-- Product Table -->
+      <div
+        id="product-table-container"
+        class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden"
+      >
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Product
+                </th>
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Category
+                </th>
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Price
+                </th>
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Stock
+                </th>
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Rating
+                </th>
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody
+              id="product-table-body"
+              class="bg-white divide-y divide-gray-200"
+            >
+              <!-- Sample Product Row -->
+              <tr class="hover:bg-gray-50 transition-colors">
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <div
+                      class="flex-shrink-0 h-12 w-12 bg-gray-100 rounded-md overflow-hidden"
+                    >
+                      <img
+                        class="h-12 w-12 object-cover"
+                        src="https://cdn.dummyjson.com/product-images/beauty/essence-mascara-lash-princess/thumbnail.webp"
+                        alt="Product thumbnail"
+                      />
+                    </div>
+                    <div class="ml-4">
+                      <div class="text-sm font-medium text-gray-900">
+                        Essence Mascara Lash Princess
+                      </div>
+                      <div class="text-sm text-gray-500">
+                        SKU: BEA-ESS-ESS-001
+                      </div>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span
+                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800"
+                  >
+                    Beauty
+                  </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  $9.99
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span
+                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"
+                  >
+                    99 in stock
+                  </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <svg
+                      class="w-4 h-4 text-yellow-400"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+                      ></path>
+                    </svg>
+                    <span class="ml-1 text-sm text-gray-700">2.56</span>
+                  </div>
+                </td>
+                <td
+                  class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"
+                >
+                  <button
+                    class="edit-btn text-blue-600 hover:text-blue-900 mr-4 focus:outline-none"
+                    aria-label="Edit product"
+                  >
+                    <svg
+                      class="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                      ></path>
+                    </svg>
+                  </button>
+                  <button
+                    class="delete-btn text-red-600 hover:text-red-900 focus:outline-none"
+                    aria-label="Delete product"
+                  >
+                    <svg
+                      class="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                      ></path>
+                    </svg>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div
+        class="hidden bg-white rounded-lg shadow-sm border border-gray-200 p-12"
+        id="loading-state"
+      >
+        <div class="flex flex-col items-center justify-center">
+          <svg
+            class="animate-spin h-12 w-12 text-blue-600"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              class="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              stroke-width="4"
+            ></circle>
+            <path
+              class="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            ></path>
+          </svg>
+          <p class="mt-4 text-gray-600 font-medium">Loading products...</p>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div
+        class="hidden bg-white rounded-lg shadow-sm border border-gray-200 p-12"
+        id="empty-state"
+      >
+        <div class="flex flex-col items-center justify-center text-center">
+          <svg
+            class="w-16 h-16 text-gray-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
+            ></path>
+          </svg>
+          <h3 class="mt-4 text-lg font-medium text-gray-900">
+            No products found
+          </h3>
+          <p class="mt-2 text-sm text-gray-500">
+            Get started by adding your first product to the inventory.
+          </p>
+          <button
+            id="empty-state-add-btn"
+            class="mt-6 inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+          >
+            <svg
+              class="w-5 h-5 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 4v16m8-8H4"
+              ></path>
+            </svg>
+            Add Your First Product
+          </button>
+        </div>
+      </div>
+
+      <!-- Error State -->
+      <div
+        class="hidden bg-white rounded-lg shadow-sm border border-red-200 p-12"
+        id="error-state"
+      >
+        <div class="flex flex-col items-center justify-center text-center">
+          <svg
+            class="w-16 h-16 text-red-500"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            ></path>
+          </svg>
+          <h3 class="mt-4 text-lg font-medium text-gray-900">
+            Failed to load products
+          </h3>
+          <p class="mt-2 text-sm text-gray-500">
+            There was an error loading your products. Please try again.
+          </p>
+          <button
+            id="error-retry-btn"
+            class="mt-6 inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+          >
+            <svg
+              class="w-5 h-5 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+              ></path>
+            </svg>
+            Retry
+          </button>
+        </div>
+      </div>
+    </main>
+
+    <!-- Modal Overlay -->
+    <div
+      class="hidden fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity z-40"
+      id="modal-overlay"
+    ></div>
+
+    <!-- Modal Form -->
+    <dialog
+      class="hidden fixed inset-0 z-50 overflow-y-auto"
+      id="product-modal"
+      aria-labelledby="modal-title"
+      aria-modal="true"
+    >
+      <div
+        class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0"
+      >
+        <span
+          class="hidden sm:inline-block sm:align-middle sm:h-screen"
+          aria-hidden="true"
+          >&#8203;</span
+        >
+
+        <div
+          class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full"
+        >
+          <!-- Modal Header -->
+          <div class="bg-white px-6 pt-6 pb-4 border-b border-gray-200">
+            <div class="flex items-center justify-between">
+              <h3 class="text-lg font-semibold text-gray-900" id="modal-title">
+                Add New Product
+              </h3>
+              <button
+                id="modal-close-btn"
+                class="text-gray-400 hover:text-gray-500 focus:outline-none"
+                aria-label="Close modal"
+              >
+                <svg
+                  class="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  ></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Modal Body -->
+          <div class="bg-white px-6 py-5 max-h-96 overflow-y-auto">
+            <form class="space-y-5" id="product-form">
+              <!-- Product Title -->
+              <div>
+                <label
+                  for="product-title"
+                  class="block text-sm font-medium text-gray-700 mb-1"
+                  >Product Title</label
+                >
+                <input
+                  type="text"
+                  id="product-title"
+                  name="title"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Enter product title"
+                  required
+                  data-field="title"
+                />
+              </div>
+
+              <!-- Description -->
+              <div>
+                <label
+                  for="product-description"
+                  class="block text-sm font-medium text-gray-700 mb-1"
+                  >Description</label
+                >
+                <textarea
+                  id="product-description"
+                  name="description"
+                  rows="3"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Enter product description"
+                  data-field="description"
+                ></textarea>
+              </div>
+
+              <!-- Category and Brand -->
+              <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                <div>
+                  <label
+                    for="product-category"
+                    class="block text-sm font-medium text-gray-700 mb-1"
+                    >Category</label
+                  >
+                  <select
+                    id="product-category"
+                    name="category"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    data-field="category"
+                  >
+                    <option value="">Select category</option>
+                    <option value="beauty">Beauty</option>
+                    <option value="electronics">Electronics</option>
+                    <option value="clothing">Clothing</option>
+                    <option value="home">Home & Garden</option>
+                    <option value="sports">Sports</option>
+                  </select>
+                </div>
+                <div>
+                  <label
+                    for="product-brand"
+                    class="block text-sm font-medium text-gray-700 mb-1"
+                    >Brand</label
+                  >
+                  <input
+                    type="text"
+                    id="product-brand"
+                    name="brand"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Enter brand name"
+                    data-field="brand"
+                  />
+                </div>
+              </div>
+
+              <!-- Price and Stock -->
+              <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                <div>
+                  <label
+                    for="product-price"
+                    class="block text-sm font-medium text-gray-700 mb-1"
+                    >Price ($)</label
+                  >
+                  <input
+                    type="number"
+                    id="product-price"
+                    name="price"
+                    step="0.01"
+                    min="0"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="0.00"
+                    required
+                    data-field="price"
+                  />
+                </div>
+                <div>
+                  <label
+                    for="product-stock"
+                    class="block text-sm font-medium text-gray-700 mb-1"
+                    >Stock Quantity</label
+                  >
+                  <input
+                    type="number"
+                    id="product-stock"
+                    name="stock"
+                    min="0"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="0"
+                    required
+                    data-field="stock"
+                  />
+                </div>
+              </div>
+
+              <!-- Discount and SKU -->
+              <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                <div>
+                  <label
+                    for="product-discount"
+                    class="block text-sm font-medium text-gray-700 mb-1"
+                    >Discount (%)</label
+                  >
+                  <input
+                    type="number"
+                    id="product-discount"
+                    name="discountPercentage"
+                    step="0.01"
+                    min="0"
+                    max="100"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="0.00"
+                    data-field="discountPercentage"
+                  />
+                </div>
+                <div>
+                  <label
+                    for="product-sku"
+                    class="block text-sm font-medium text-gray-700 mb-1"
+                    >SKU</label
+                  >
+                  <input
+                    type="text"
+                    id="product-sku"
+                    name="sku"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="PROD-XXX-XXX-XXX"
+                    data-field="sku"
+                  />
+                </div>
+              </div>
+
+              <!-- Image URL -->
+              <div>
+                <label
+                  for="product-image"
+                  class="block text-sm font-medium text-gray-700 mb-1"
+                  >Product Image URL</label
+                >
+                <input
+                  type="url"
+                  id="product-image"
+                  name="thumbnail"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="https://example.com/image.jpg"
+                  data-field="thumbnail"
+                />
+              </div>
+
+              <!-- Availability Status -->
+              <div>
+                <label
+                  for="product-availability"
+                  class="block text-sm font-medium text-gray-700 mb-1"
+                  >Availability Status</label
+                >
+                <select
+                  id="product-availability"
+                  name="availabilityStatus"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  data-field="availabilityStatus"
+                >
+                  <option value="In Stock">In Stock</option>
+                  <option value="Low Stock">Low Stock</option>
+                  <option value="Out of Stock">Out of Stock</option>
+                </select>
+              </div>
+            </form>
+          </div>
+
+          <!-- Modal Footer -->
+          <div
+            class="bg-gray-50 px-6 py-4 flex flex-col-reverse sm:flex-row sm:justify-end gap-3"
+          >
+            <button
+              type="button"
+              id="modal-cancel-btn"
+              class="w-full sm:w-auto inline-flex justify-center items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              id="modal-save-btn"
+              class="w-full sm:w-auto inline-flex justify-center items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              Save Product
+            </button>
+          </div>
+        </div>
+      </div>
+    </dialog>
+    <script type="module" src="js/app.js"></script>
+  </body>
+</html>
