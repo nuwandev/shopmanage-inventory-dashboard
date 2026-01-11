@@ -1,4 +1,10 @@
-import { getProducts } from "./api.js";
+import {
+  addProduct,
+  deleteProductById,
+  getProductById,
+  getProducts,
+  updateProduct,
+} from "./api.js";
 import { showState } from "./state.js";
 
 const appState = {
@@ -7,11 +13,18 @@ const appState = {
     productsPerPage: 10,
     totalProducts: 0,
   },
+  modal: {
+    mode: "add",
+    currentProductId: null,
+  },
 };
 
 document.addEventListener("DOMContentLoaded", () => {
   loadProducts();
   setupPagination();
+  setupModalHandlers();
+  setupTableHandlers();
+  setupErrorRetry();
 });
 
 async function loadProducts(page = 1) {
@@ -143,4 +156,135 @@ function setupPagination() {
       loadProducts(currentPage + 1);
     }
   });
+}
+
+function setupModalHandlers() {
+  document.getElementById("add-product-btn").addEventListener("click", () => {
+    openModal("add");
+  });
+
+  document
+    .getElementById("empty-state-add-btn")
+    .addEventListener("click", () => {
+      openModal("add");
+    });
+
+  document.getElementById("modal-close-btn").addEventListener("click", () => {
+    closeModal();
+  });
+
+  document.getElementById("modal-cancel-btn").addEventListener("click", () => {
+    closeModal();
+  });
+
+  document.getElementById("modal-backdrop").addEventListener("click", (e) => {
+    if (e.target.id === "modal-backdrop") {
+      closeModal();
+    }
+  });
+
+  document
+    .getElementById("modal-save-btn")
+    .addEventListener("click", handleFormSubmit);
+}
+
+function setupTableHandlers() {
+  document
+    .getElementById("product-table-body")
+    .addEventListener("click", async (e) => {
+      const row = e.target.closest("tr");
+      if (!row) return;
+
+      const productId = row.dataset.productId;
+
+      if (e.target.closest(".edit-btn")) {
+        try {
+          const product = await getProductById(productId);
+          openModal("edit", product);
+        } catch (error) {
+          alert("Failed to load product details");
+          console.error(error);
+        }
+      }
+
+      if (e.target.closest(".delete-btn")) {
+        if (confirm("Are you sure you want to delete this product?")) {
+          try {
+            await deleteProductById(productId);
+            loadProducts(appState.pagination.currentPage);
+          } catch (error) {
+            alert("Failed to delete product");
+            console.error(error);
+          }
+        }
+      }
+    });
+}
+
+function setupErrorRetry() {
+  document.getElementById("error-retry-btn").addEventListener("click", () => {
+    loadProducts();
+  });
+}
+
+function openModal(mode, productData = null) {
+  appState.modal.mode = mode;
+  appState.modal.currentProductId = productData?.id || null;
+
+  document.getElementById("modal-title").textContent =
+    mode === "add" ? "Add New Product" : "Edit Product";
+
+  document.getElementById("product-form").reset();
+
+  if (mode === "edit" && productData) {
+    document.querySelectorAll("[data-field]").forEach((input) => {
+      const field = input.dataset.field;
+      input.value = productData[field] || "";
+    });
+  }
+
+  document.getElementById("product-modal").classList.remove("hidden");
+  document.getElementById("modal-overlay").classList.remove("hidden");
+}
+
+function closeModal() {
+  document.getElementById("product-modal").classList.add("hidden");
+  document.getElementById("modal-overlay").classList.add("hidden");
+  document.getElementById("product-form").reset();
+  appState.modal.mode = "add";
+  appState.modal.currentProductId = null;
+}
+
+async function handleFormSubmit(e) {
+  e.preventDefault();
+
+  const formData = {};
+  document.querySelectorAll("[data-field]").forEach((input) => {
+    const field = input.dataset.field;
+    formData[field] = input.value;
+  });
+
+  const submitBtn = document.getElementById("modal-save-btn");
+  const originalText = submitBtn.textContent;
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Saving...";
+
+  try {
+    if (appState.modal.mode === "add") {
+      await addProduct(formData);
+      alert("Product added successfully!");
+    } else {
+      await updateProduct(appState.modal.currentProductId, formData);
+      alert("Product updated successfully!");
+    }
+
+    closeModal();
+    loadProducts(appState.pagination.currentPage);
+  } catch (error) {
+    console.error("Error submitting form:", error);
+    alert("Failed to save product. Please try again.");
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = originalText;
+  }
 }
