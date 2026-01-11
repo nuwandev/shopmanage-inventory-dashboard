@@ -4,8 +4,12 @@ import {
   getProductById,
   getProducts,
   updateProduct,
+  searchProducts,
+  getAllCategories,
+  getProductsByCategory,
 } from "./api.js";
 import { showState } from "./state.js";
+import { debounce } from "./utils.js";
 
 const appState = {
   pagination: {
@@ -17,6 +21,11 @@ const appState = {
     mode: "add",
     currentProductId: null,
   },
+  filters: {
+    searchQuery: "",
+    selectedCategory: "",
+    sortBy: "",
+  },
 };
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -25,6 +34,8 @@ document.addEventListener("DOMContentLoaded", () => {
   setupModalHandlers();
   setupTableHandlers();
   setupErrorRetry();
+  setupFilters();
+  loadCategories();
 });
 
 async function loadProducts(page = 1) {
@@ -141,6 +152,19 @@ function updatePagination() {
 
   prevBtn.disabled = currentPage === 1;
   nextBtn.disabled = currentPage * productsPerPage >= totalProducts;
+}
+
+function updateFilteredPagination(totalFilteredProducts) {
+  document.getElementById("pagination-start").textContent = 1;
+  document.getElementById("pagination-end").textContent = totalFilteredProducts;
+  document.getElementById("pagination-total").textContent =
+    totalFilteredProducts;
+
+  const prevBtn = document.getElementById("pagination-prev");
+  const nextBtn = document.getElementById("pagination-next");
+
+  prevBtn.disabled = true;
+  nextBtn.disabled = true;
 }
 
 function setupPagination() {
@@ -287,4 +311,173 @@ async function handleFormSubmit(e) {
     submitBtn.disabled = false;
     submitBtn.textContent = originalText;
   }
+}
+
+async function loadCategories() {
+  try {
+    const categories = await getAllCategories();
+    const categorySelect = document.getElementById("category-filter");
+
+    categories.forEach((category) => {
+      const option = document.createElement("option");
+      option.value = category.slug;
+      option.textContent = category.name;
+      categorySelect.appendChild(option);
+    });
+  } catch (error) {
+    console.error("Error loading categories:", error);
+  }
+}
+
+function setupFilters() {
+  const searchInput = document.getElementById("search-input");
+  searchInput.addEventListener(
+    "input",
+    debounce((e) => {
+      appState.filters.searchQuery = e.target.value.trim();
+      applyFilters();
+    }, 500)
+  );
+
+  document.getElementById("category-filter").addEventListener("change", (e) => {
+    appState.filters.selectedCategory = e.target.value;
+    applyFilters();
+  });
+
+  document.getElementById("sort-select").addEventListener("change", (e) => {
+    appState.filters.sortBy = e.target.value;
+    applyFilters();
+  });
+
+  document.getElementById("clear-filters-btn").addEventListener("click", () => {
+    clearAllFilters();
+  });
+}
+
+async function applyFilters() {
+  try {
+    showState("loading-state");
+    let data;
+    let products = [];
+
+    if (appState.filters.searchQuery) {
+      data = await searchProducts(appState.filters.searchQuery);
+      products = data?.products || [];
+    } else if (appState.filters.selectedCategory) {
+      data = await getProductsByCategory(appState.filters.selectedCategory);
+      products = data?.products || [];
+    } else {
+      data = await getProducts({ limit: 100 });
+      products = data?.products || [];
+    }
+
+    if (appState.filters.searchQuery && appState.filters.selectedCategory) {
+      products = products.filter(
+        (product) => product.category === appState.filters.selectedCategory
+      );
+    }
+
+    if (appState.filters.sortBy) {
+      products = sortProducts(products, appState.filters.sortBy);
+    }
+
+    if (products.length > 0) {
+      showState("product-table-container");
+      displayProducts(products);
+      updateFilteredPagination(products.length);
+      updateActiveFilters();
+    } else {
+      showState("empty-state");
+    }
+  } catch (error) {
+    showState("error-state");
+    console.error("Error applying filters:", error);
+  }
+}
+
+function sortProducts(products, sortBy) {
+  const sorted = [...products];
+
+  switch (sortBy) {
+    case "title-asc":
+      return sorted.sort((a, b) => a.title.localeCompare(b.title));
+    case "title-desc":
+      return sorted.sort((a, b) => b.title.localeCompare(a.title));
+    case "price-asc":
+      return sorted.sort((a, b) => a.price - b.price);
+    case "price-desc":
+      return sorted.sort((a, b) => b.price - a.price);
+    case "rating-asc":
+      return sorted.sort((a, b) => a.rating - b.rating);
+    case "rating-desc":
+      return sorted.sort((a, b) => b.rating - a.rating);
+    case "stock-asc":
+      return sorted.sort((a, b) => a.stock - b.stock);
+    case "stock-desc":
+      return sorted.sort((a, b) => b.stock - a.stock);
+    default:
+      return sorted;
+  }
+}
+
+function updateActiveFilters() {
+  const activeFiltersDiv = document.getElementById("active-filters");
+  const filterTagsDiv = document.getElementById("filter-tags");
+  filterTagsDiv.innerHTML = "";
+
+  const hasFilters =
+    appState.filters.searchQuery ||
+    appState.filters.selectedCategory ||
+    appState.filters.sortBy;
+
+  if (hasFilters) {
+    activeFiltersDiv.classList.remove("hidden");
+
+    if (appState.filters.searchQuery) {
+      filterTagsDiv.appendChild(
+        createFilterTag("Search", appState.filters.searchQuery)
+      );
+    }
+
+    if (appState.filters.selectedCategory) {
+      filterTagsDiv.appendChild(
+        createFilterTag("Category", appState.filters.selectedCategory)
+      );
+    }
+
+    if (appState.filters.sortBy) {
+      const sortLabel = document.querySelector(
+        `#sort-select option[value="${appState.filters.sortBy}"]`
+      ).textContent;
+      filterTagsDiv.appendChild(createFilterTag("Sort", sortLabel));
+    }
+  } else {
+    activeFiltersDiv.classList.add("hidden");
+  }
+}
+
+function createFilterTag(label, value) {
+  const tag = document.createElement("span");
+  tag.className =
+    "inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800";
+  tag.innerHTML = `
+    <span class="font-semibold">${label}:</span>
+    <span class="ml-1">${value}</span>
+  `;
+  return tag;
+}
+
+function clearAllFilters() {
+  appState.filters.searchQuery = "";
+  appState.filters.selectedCategory = "";
+  appState.filters.sortBy = "";
+
+  document.getElementById("search-input").value = "";
+  document.getElementById("category-filter").value = "";
+  document.getElementById("sort-select").value = "";
+
+  document.getElementById("active-filters").classList.add("hidden");
+  document.getElementById("filter-tags").innerHTML = "";
+
+  loadProducts();
 }

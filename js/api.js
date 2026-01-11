@@ -68,3 +68,37 @@ export async function updateProduct(id, formData) {
     console.error(`Error updating product with ID ${id}:`, error);
   }
 }
+
+export async function searchProducts(query) {
+  try {
+    const response = await fetch(
+      `https://dummyjson.com/products/search?q=${encodeURIComponent(query)}`
+    );
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error searching products:", error);
+  }
+}
+
+export async function getAllCategories() {
+  try {
+    const response = await fetch(`https://dummyjson.com/products/categories`);
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching categories:", error);
+  }
+}
+
+export async function getProductsByCategory(category) {
+  try {
+    const response = await fetch(
+      `https://dummyjson.com/products/category/${encodeURIComponent(category)}`
+    );
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error(`Error fetching products for category ${category}:`, error);
+  }
+}
